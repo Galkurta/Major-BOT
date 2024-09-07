@@ -1,0 +1,18 @@
+{
+  "name": "major-bot",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "chalk": "^5.3.0",
+    "colors": "^1.4.0",
+    "luxon": "^3.5.0"
+  }
+}
