@@ -254,10 +254,7 @@ class Major {
           this.log("Durov puzzle search unsuccessful", "error");
         }
       } else if (today > payloadDate) {
-        this.log(
-          "No new Durov combo for today, need to mention @hung96 to update the combo",
-          "warning"
-        );
+        this.log("No new Durov combo for today", "warning");
       } else {
         this.log(
           "Payload date is in the future. Please check the date format.",
