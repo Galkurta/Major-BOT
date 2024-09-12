@@ -116,9 +116,7 @@ bot.onText(/\/summary/, async (msg) => {
       .catch(() => null);
 
     if (summaryData) {
-      const message = `[ Summary Major ]\n‣ Total Accounts: ${
-        summaryData.totalAccounts
-      }\n‣ Total Balance: ${summaryData.totalBalance.toFixed(3)}`;
+      const message = `[ Summary Major ]\n‣ Total Accounts: ${summaryData.totalAccounts}\n‣ Total Balance: ${summaryData.totalBalance}`;
       bot.sendMessage(chatId, message);
     } else {
       bot.sendMessage(
@@ -134,7 +132,6 @@ bot.onText(/\/summary/, async (msg) => {
     );
   }
 });
-
 // Removed the general message logging
 
 console.log("Telegram bot is running...");
