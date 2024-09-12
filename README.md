@@ -1,6 +1,6 @@
 # Major Automation Project
 
-This project automates interactions with the Major platform, including daily check-ins, roulette spins, coin holding, task completions, and Durov puzzle solving.
+This project automates interactions with the Major platform, including daily check-ins, roulette spins, coin holding, task completions, and Durov puzzle solving. It now includes a Telegram bot for easier management and updates.
 
 ## Features
 
@@ -11,6 +11,7 @@ This project automates interactions with the Major platform, including daily che
 - Task completion
 - Durov puzzle solving
 - Multi-account support
+- Telegram bot integration for remote management
 
 ## Prerequisites
 
@@ -18,6 +19,7 @@ Before you begin, ensure you have met the following requirements:
 
 - Node.js installed (version 12.x or higher recommended)
 - npm (Node Package Manager) installed
+- A Telegram bot token (obtain from BotFather on Telegram)
 
 ## Installation
 
@@ -36,23 +38,20 @@ Before you begin, ensure you have met the following requirements:
 
 3. Edit `data.txt` file in the project root directory and add your Major authentication data, one per line.
 
-4. Create a `durov.json` file in the project root directory with the following structure:
+4. Create a `.env` file in the project root and add your Telegram bot token:
 
-   ```json
-   {
-     "date": "DD/MM/YYYY",
-     "tasks": [
-       {
-         "choice_1": 0,
-         "choice_2": 0,
-         "choice_3": 0,
-         "choice_4": 0
-       }
-     ]
-   }
+   ```
+   TELEGRAM_BOT_TOKEN=your_bot_token_here
+   AUTHORIZED_USERS=your_telegram_user_id
    ```
 
-   Replace the zeros with the correct puzzle choices and update the date accordingly.
+   Replace `your_bot_token_here` with your actual bot token and `your_telegram_user_id` with your Telegram user ID.
+
+5. Update `config.js` to enable or disable the Telegram bot:
+
+   ```javascript
+   useTelegramBot: true, // Set to false if you don't want to use the Telegram bot
+   ```
 
 ## Usage
 
@@ -62,18 +61,33 @@ To run the automation script:
 node main.js
 ```
 
-The script will process all accounts listed in `data.txt` and repeat the process approximately every 8 hours.
+The script will process all accounts listed in `data.txt` and repeat the process approximately every 8 hours. If the Telegram bot is enabled, it will start automatically.
+
+### Telegram Bot Commands
+
+- `/start` - Start the bot
+- `/help` - Show available commands
+- `/update DD/MM/YYYY choice1 choice2 choice3 choice4` - Update Durov puzzle data
+- `/summary` - Get a summary of accounts and total balance
 
 ### Updating Durov Puzzle Choices
 
-To update the Durov puzzle choices:
+To update the Durov puzzle choices using the Telegram bot:
 
-1. Open the `durov.json` file.
-2. Update the "date" field to the current date in DD/MM/YYYY format.
-3. Modify the "choice_1" through "choice_4" values in the "tasks" array with the correct puzzle choices.
-4. Save the file.
+1. Start a chat with your bot on Telegram.
+2. Send a message in the following format:
 
-The script will automatically use these choices when attempting to solve the Durov puzzle.
+   ```
+   /update DD/MM/YYYY choice1 choice2 choice3 choice4
+   ```
+
+   For example:
+
+   ```
+   /update 15/09/2024 7 4 12 5
+   ```
+
+3. The bot will update the `durov.json` file with the new puzzle choices for the specified date.
 
 ## Registration
 
