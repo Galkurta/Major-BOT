@@ -1,6 +1,6 @@
 # Major Automation Project
 
-This project automates interactions with the Major platform, including daily check-ins, roulette spins, coin holding, and task completions.
+This project automates interactions with the Major platform, including daily check-ins, roulette spins, coin holding, task completions, and Durov puzzle solving.
 
 ## Features
 
@@ -9,8 +9,8 @@ This project automates interactions with the Major platform, including daily che
 - Roulette spins
 - Coin holding and swiping
 - Task completion
+- Durov puzzle solving
 - Multi-account support
-- Detailed logging of actions and results
 
 ## Prerequisites
 
@@ -36,6 +36,24 @@ Before you begin, ensure you have met the following requirements:
 
 3. Edit `data.txt` file in the project root directory and add your Major authentication data, one per line.
 
+4. Create a `durov.json` file in the project root directory with the following structure:
+
+   ```json
+   {
+     "date": "DD/MM/YYYY",
+     "tasks": [
+       {
+         "choice_1": 0,
+         "choice_2": 0,
+         "choice_3": 0,
+         "choice_4": 0
+       }
+     ]
+   }
+   ```
+
+   Replace the zeros with the correct puzzle choices and update the date accordingly.
+
 ## Usage
 
 To run the automation script:
@@ -45,6 +63,17 @@ node main.js
 ```
 
 The script will process all accounts listed in `data.txt` and repeat the process approximately every 8 hours.
+
+### Updating Durov Puzzle Choices
+
+To update the Durov puzzle choices:
+
+1. Open the `durov.json` file.
+2. Update the "date" field to the current date in DD/MM/YYYY format.
+3. Modify the "choice_1" through "choice_4" values in the "tasks" array with the correct puzzle choices.
+4. Save the file.
+
+The script will automatically use these choices when attempting to solve the Durov puzzle.
 
 ## Registration
 

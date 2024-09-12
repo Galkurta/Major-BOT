@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require("fs").promises;
 const axios = require("axios");
 const colors = require("colors");
 const { DateTime } = require("luxon");
@@ -15,8 +15,10 @@ class Major {
       holdCoins: `${this.baseUrl}/bonuses/coins/`,
       tasks: `${this.baseUrl}/tasks/`,
       swipeCoin: `${this.baseUrl}/swipe_coin/`,
+      durov: `${this.baseUrl}/durov/`,
     };
     this.totalBalance = 0;
+    this.durovPayloadUrl = "./durov.json"; // Updated to use local file
   }
 
   headers(token = null) {
@@ -189,6 +191,101 @@ class Major {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  async getDurovPayload() {
+    try {
+      const data = await fs.readFile(this.durovPayloadUrl, "utf8");
+      return JSON.parse(data);
+    } catch (error) {
+      this.log(`Error reading Durov payload: ${error.message}`, "error");
+      return null;
+    }
+  }
+
+  async handleDurovTask(token) {
+    try {
+      const getResult = await this.apiRequest(
+        "get",
+        this.endpoints.durov,
+        null,
+        token
+      );
+
+      if (getResult.detail && getResult.detail.blocked_until) {
+        const blockedTime = this.formatBlockedTime(
+          getResult.detail.blocked_until
+        );
+        this.log(
+          `Durov puzzle search failed, need to invite ${getResult.detail.need_invites} more friends or wait until ${blockedTime}`,
+          "warning"
+        );
+        return;
+      }
+
+      if (!getResult.success) {
+        this.log("Durov GET request failed", "error");
+        return;
+      }
+
+      const payloadData = await this.getDurovPayload();
+      if (!payloadData) {
+        this.log("Failed to fetch Durov payload", "error");
+        return;
+      }
+
+      const today = DateTime.now().setZone("system");
+      const payloadDate = DateTime.fromFormat(payloadData.date, "dd/MM/yyyy");
+
+      if (today.hasSame(payloadDate, "day")) {
+        const payload = payloadData.tasks[0];
+        const postResult = await this.apiRequest(
+          "post",
+          this.endpoints.durov,
+          payload,
+          token
+        );
+
+        if (
+          postResult.correct &&
+          JSON.stringify(postResult.correct) ===
+            JSON.stringify(Object.values(payload))
+        ) {
+          this.log("Durov puzzle search successful", "success");
+        } else {
+          this.log("Durov puzzle search unsuccessful", "error");
+        }
+      } else if (today > payloadDate) {
+        this.log(
+          "No new Durov combo for today, need to mention @hung96 to update the combo",
+          "warning"
+        );
+      } else {
+        this.log(
+          "Payload date is in the future. Please check the date format.",
+          "warning"
+        );
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.detail
+      ) {
+        const detail = error.response.data.detail;
+        if (detail.blocked_until) {
+          const blockedTime = this.formatBlockedTime(detail.blocked_until);
+          this.log(
+            `Durov puzzle search failed, need to invite ${detail.need_invites} more friends or wait until ${blockedTime}`,
+            "warning"
+          );
+        } else {
+          this.log(`Error in Durov task: ${detail}`, "error");
+        }
+      } else {
+        this.log(`Error in Durov task: ${error.message}`, "error");
+      }
+    }
+  }
+
   async processAccount(init_data, accountIndex) {
     const authResult = await this.authenticate(init_data);
     if (!authResult || !authResult.access_token || !authResult.user) {
@@ -311,6 +408,9 @@ class Major {
         this.log("Tasks: Failed to retrieve", "error");
       }
 
+      // Handle Durov task
+      await this.handleDurovTask(access_token);
+
       // Get updated user info to ensure we have the latest balance
       await this.getUserInfo(id, access_token);
     } catch (error) {
@@ -323,15 +423,16 @@ class Major {
 
   async main() {
     const dataFile = "data.txt";
-    const data = fs.readFileSync(dataFile, "utf8").split("\n").filter(Boolean);
+    const data = await fs.readFile(dataFile, "utf8");
+    const accounts = data.split("\n").filter(Boolean);
 
     while (true) {
       this.totalBalance = 0;
-      for (let i = 0; i < data.length; i++) {
-        const init_data = data[i].trim();
+      for (let i = 0; i < accounts.length; i++) {
+        const init_data = accounts[i].trim();
         await this.processAccount(init_data, i);
 
-        if (i < data.length - 1) {
+        if (i < accounts.length - 1) {
           await this.waitWithCountdown(3);
         }
       }
