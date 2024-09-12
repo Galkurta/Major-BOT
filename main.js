@@ -314,7 +314,20 @@ class Major {
   }
 
   async saveSummary() {
-    await fs.writeFile("summary.json", JSON.stringify(this.summary, null, 2));
+    const formattedSummary = {
+      totalAccounts: this.summary.totalAccounts.toLocaleString(),
+      totalBalance: Number(this.summary.totalBalance).toLocaleString(
+        undefined,
+        {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2,
+        }
+      ),
+    };
+    await fs.writeFile(
+      "summary.json",
+      JSON.stringify(formattedSummary, null, 2)
+    );
   }
 
   async processAccount(init_data, accountIndex) {
