@@ -11,7 +11,6 @@ This project automates interactions with the Major platform, including daily che
 - Task completion
 - Durov puzzle solving
 - Multi-account support
-- Detailed logging of actions and results
 
 ## Prerequisites
 
@@ -75,45 +74,6 @@ To update the Durov puzzle choices:
 4. Save the file.
 
 The script will automatically use these choices when attempting to solve the Durov puzzle.
-
-### Adding New Puzzle Lists to durov.json
-
-If you want to add multiple sets of puzzle choices for different dates, you can modify the `durov.json` file as follows:
-
-1. Open the `durov.json` file.
-2. Update the structure to include multiple date-task pairs:
-
-   ```json
-   [
-     {
-       "date": "12/09/2024",
-       "tasks": [
-         {
-           "choice_1": 7,
-           "choice_2": 4,
-           "choice_3": 12,
-           "choice_4": 5
-         }
-       ]
-     },
-     {
-       "date": "13/09/2024",
-       "tasks": [
-         {
-           "choice_1": 3,
-           "choice_2": 8,
-           "choice_3": 10,
-           "choice_4": 2
-         }
-       ]
-     }
-   ]
-   ```
-
-3. Add as many date-task pairs as needed, ensuring each has a unique date.
-4. Save the file.
-
-The script will automatically select the appropriate puzzle choices based on the current date when running the Durov task.
 
 ## Registration
 
